@@ -1,543 +1,369 @@
-import React, { useState } from "react";
-import { CalendarDays, Plus, Eye, Pencil, Trash2, X } from "lucide-react";
+import { useState } from "react";
 
-const Events = () => {
-  // ================= DUMMY DATA =================
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: "Annual Function",
-      eventFor: "All Alumni",
-      classSection: "All",
-      passOutSession: "2022",
-      from: "10 Jun 2025",
-      to: "12 Jun 2025",
-      note: "Annual cultural function event.",
-      notification: "All alumni are invited to attend the annual function.",
-      photo:
-        "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=400",
-    },
-    {
-      id: 2,
-      title: "Sports Meet",
-      eventFor: "Class 10 - A",
-      classSection: "10 A",
-      passOutSession: "2023",
-      from: "15 Jul 2025",
-      to: "17 Jul 2025",
-      note: "Inter school sports meet.",
-      notification: "Students should report by 8 AM in sports uniform.",
-      photo:
-        "https://images.unsplash.com/photo-1547347298-4074fc3086f0?q=80&w=400",
-    },
-  ]);
+const initialEvents = [
+  {
+    id: 1,
+    title: "Independence Day",
+    classSection: "All",
+    session: "2026",
+    from: "2026-08-15",
+    to: "2026-08-15",
+  },
+  {
+    id: 2,
+    title: "Republic Day",
+    classSection: "All",
+    session: "2026",
+    from: "2026-01-26",
+    to: "2026-01-26",
+  },
+];
 
-  // ================= STATES =================
-  const [showModal, setShowModal] = useState(false);
-  const [viewModal, setViewModal] = useState(false);
-
-  const [selectedEvent, setSelectedEvent] = useState(null);
+export default function Events() {
+  const [events, setEvents] = useState(initialEvents);
 
   const [formData, setFormData] = useState({
     title: "",
-    eventFor: "all",
-    className: "",
-    section: "",
+    classSection: "",
     session: "",
     from: "",
     to: "",
-    note: "",
-    notification: "",
   });
 
-  // ================= ADD EVENT =================
-  const addEvent = () => {
-    setFormData({
-      title: "",
-      eventFor: "all",
-      className: "",
-      section: "",
-      session: "",
-      from: "",
-      to: "",
-      note: "",
-      notification: "",
-    });
+  const [showModal, setShowModal] = useState(false);
 
-    setShowModal(true);
+  // Current Date
+  const today = new Date();
+
+  const month = today.toLocaleString("default", {
+    month: "long",
+  });
+
+  const year = today.getFullYear();
+
+  // Total days
+  const daysInMonth = new Date(
+    year,
+    today.getMonth() + 1,
+    0
+  ).getDate();
+
+  // First day
+  const firstDay = new Date(
+    year,
+    today.getMonth(),
+    1
+  ).getDay();
+
+  // Change input
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  // ================= SAVE EVENT =================
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  // Save Event
+  const handleSave = () => {
+    if (
+      !formData.title ||
+      !formData.classSection ||
+      !formData.session ||
+      !formData.from ||
+      !formData.to
+    ) {
+      alert("Please fill all fields");
+      return;
+    }
 
     const newEvent = {
       id: Date.now(),
-      title: formData.title,
-      eventFor:
-        formData.eventFor === "all"
-          ? "All Alumni"
-          : `${formData.className} ${formData.section}`,
-      classSection:
-        formData.eventFor === "all"
-          ? "All"
-          : `${formData.className} ${formData.section}`,
-      passOutSession: formData.session,
-      from: formData.from,
-      to: formData.to,
-      note: formData.note,
-      notification: formData.notification,
-      photo:
-        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=400",
+      ...formData,
     };
 
     setEvents([...events, newEvent]);
 
+    setFormData({
+      title: "",
+      classSection: "",
+      session: "",
+      from: "",
+      to: "",
+    });
+
     setShowModal(false);
   };
 
-  // ================= VIEW EVENT =================
-  const viewEvent = (event) => {
-    setSelectedEvent(event);
-    setViewModal(true);
+  // Delete
+  const handleDelete = (id) => {
+    setEvents(events.filter((item) => item.id !== id));
   };
 
-  // ================= DELETE EVENT =================
-  const deleteEvent = (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete?");
+  // Calendar cells
+  const calendarCells = [];
 
-    if (confirmDelete) {
-      setEvents(events.filter((item) => item.id !== id));
-    }
-  };
+  for (let i = 0; i < firstDay; i++) {
+    calendarCells.push(
+      <div
+        key={`empty-${i}`}
+        className="h-28 border bg-gray-50"
+      />
+    );
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    calendarCells.push(
+      <div
+        key={day}
+        className="h-28 border p-2 bg-white hover:bg-yellow-50"
+      >
+        <div className="text-gray-700 text-sm">
+          {day}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-slate-100 p-6">
-      {/* HEADER */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-800">
-            Events Management
-          </h1>
+    <div className="p-6">
 
-          <p className="text-slate-500 mt-1">Manage school alumni events</p>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        <button
-          onClick={addEvent}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl flex items-center gap-2 transition-all"
-        >
-          <Plus size={18} />
-          Add Event
-        </button>
-      </div>
+        {/* LEFT CALENDAR */}
+        <div className="bg-white border rounded shadow">
 
-      {/* MAIN GRID */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* CALENDAR */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-5">
-            <CalendarDays className="text-blue-600" />
-            <h2 className="text-xl font-semibold text-slate-800">
-              Event Calendar
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b">
+
+            <div className="flex gap-2">
+              <button className="bg-gray-600 text-white px-3 py-1 rounded">
+                ◀
+              </button>
+
+              <button className="bg-gray-600 text-white px-3 py-1 rounded">
+                ▶
+              </button>
+            </div>
+
+            <h2 className="text-3xl font-medium">
+              {month} {year}
             </h2>
+
+            <div />
           </div>
 
-          <div className="h-[500px] border-2 border-dashed border-slate-300 rounded-2xl flex items-center justify-center text-slate-400">
-            Full Calendar Component Here
+          {/* Days */}
+          <div className="grid grid-cols-7 text-center bg-gray-100 font-medium">
+
+            <div className="p-3 border">Mon</div>
+            <div className="p-3 border">Tue</div>
+            <div className="p-3 border">Wed</div>
+            <div className="p-3 border">Thu</div>
+            <div className="p-3 border">Fri</div>
+            <div className="p-3 border">Sat</div>
+            <div className="p-3 border">Sun</div>
+
+          </div>
+
+          {/* Calendar */}
+          <div className="grid grid-cols-7">
+            {calendarCells}
           </div>
         </div>
 
-        {/* TABLE */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 overflow-hidden">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-xl font-semibold text-slate-800">Event List</h2>
+        {/* RIGHT SIDE */}
+        <div className="bg-white border rounded shadow overflow-hidden">
+
+          {/* Top */}
+          <div className="flex items-center justify-between p-4 border-b">
+
+            <h2 className="text-2xl font-semibold">
+              Event List
+            </h2>
+
+            <button
+              onClick={() => setShowModal(true)}
+              className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded"
+            >
+              Add Event
+            </button>
+
           </div>
 
-          <div className="overflow-auto">
-            <table className="w-full min-w-[850px]">
-              <thead>
-                <tr className="border-b border-slate-200 text-left">
-                  <th className="pb-4 text-sm font-semibold text-slate-600">
+          {/* Search */}
+          <div className="p-4 border-b">
+
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full border rounded px-3 py-2 outline-none"
+            />
+
+          </div>
+
+          {/* Table */}
+          <div className="overflow-x-auto">
+
+            <table className="w-full">
+
+              <thead className="bg-gray-100">
+
+                <tr>
+
+                  <th className="p-3 text-left border-b">
                     Event Title
                   </th>
 
-                  <th className="pb-4 text-sm font-semibold text-slate-600">
-                    Class / Section
+                  <th className="p-3 text-left border-b">
+                    Class Section
                   </th>
 
-                  <th className="pb-4 text-sm font-semibold text-slate-600">
+                  <th className="p-3 text-left border-b">
                     Pass Out Session
                   </th>
 
-                  <th className="pb-4 text-sm font-semibold text-slate-600">
+                  <th className="p-3 text-left border-b">
                     From
                   </th>
 
-                  <th className="pb-4 text-sm font-semibold text-slate-600">
+                  <th className="p-3 text-left border-b">
                     To
                   </th>
 
-                  <th className="pb-4 text-sm font-semibold text-slate-600">
+                  <th className="p-3 text-left border-b">
                     Action
                   </th>
+
                 </tr>
+
               </thead>
 
               <tbody>
+
                 {events.map((event) => (
                   <tr
                     key={event.id}
-                    className="border-b border-slate-100 hover:bg-slate-50 transition-all"
+                    className="hover:bg-gray-50"
                   >
-                    <td className="py-4 font-medium text-slate-700">
+
+                    <td className="p-3 border-b">
                       {event.title}
                     </td>
 
-                    <td className="py-4 text-slate-600">
+                    <td className="p-3 border-b">
                       {event.classSection}
                     </td>
 
-                    <td className="py-4 text-slate-600">
-                      {event.passOutSession}
+                    <td className="p-3 border-b">
+                      {event.session}
                     </td>
 
-                    <td className="py-4 text-slate-600">{event.from}</td>
-
-                    <td className="py-4 text-slate-600">{event.to}</td>
-
-                    <td className="py-4">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => viewEvent(event)}
-                          className="p-2 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-600 transition-all"
-                        >
-                          <Eye size={16} />
-                        </button>
-
-                        <button className="p-2 rounded-lg bg-slate-100 hover:bg-green-100 text-slate-700 hover:text-green-600 transition-all">
-                          <Pencil size={16} />
-                        </button>
-
-                        <button
-                          onClick={() => deleteEvent(event.id)}
-                          className="p-2 rounded-lg bg-slate-100 hover:bg-red-100 text-slate-700 hover:text-red-600 transition-all"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+                    <td className="p-3 border-b">
+                      {event.from}
                     </td>
+
+                    <td className="p-3 border-b">
+                      {event.to}
+                    </td>
+
+                    <td className="p-3 border-b">
+                      <button
+                        onClick={() =>
+                          handleDelete(event.id)
+                        }
+                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                      >
+                        Delete
+                      </button>
+                    </td>
+
                   </tr>
                 ))}
+
               </tbody>
+
             </table>
           </div>
         </div>
       </div>
 
-      {/* ================= ADD EVENT MODAL ================= */}
+      {/* MODAL */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden">
-            {/* HEADER */}
-            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-              <h2 className="text-2xl font-bold text-slate-800">Add Event</h2>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+          <div className="bg-white rounded-xl w-full max-w-lg p-6 space-y-4">
+
+            <h2 className="text-2xl font-semibold">
+              Add Event
+            </h2>
+
+            <input
+              type="text"
+              name="title"
+              placeholder="Event Title"
+              value={formData.title}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+            />
+
+            <input
+              type="text"
+              name="classSection"
+              placeholder="Class Section"
+              value={formData.classSection}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+            />
+
+            <input
+              type="text"
+              name="session"
+              placeholder="Pass Out Session"
+              value={formData.session}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+
+              <input
+                type="date"
+                name="from"
+                value={formData.from}
+                onChange={handleChange}
+                className="border rounded px-3 py-2"
+              />
+
+              <input
+                type="date"
+                name="to"
+                value={formData.to}
+                onChange={handleChange}
+                className="border rounded px-3 py-2"
+              />
+
+            </div>
+
+            <div className="flex justify-end gap-3 pt-2">
 
               <button
                 onClick={() => setShowModal(false)}
-                className="p-2 hover:bg-slate-100 rounded-xl"
+                className="bg-gray-300 px-4 py-2 rounded"
               >
-                <X size={20} />
+                Cancel
               </button>
-            </div>
-
-            {/* BODY */}
-            <form
-              onSubmit={handleSubmit}
-              className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5"
-            >
-              {/* EVENT FOR */}
-              <div className="md:col-span-2">
-                <label className="font-medium text-slate-700">Event For</label>
-
-                <div className="flex gap-6 mt-3">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="eventFor"
-                      value="all"
-                      checked={formData.eventFor === "all"}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          eventFor: e.target.value,
-                        })
-                      }
-                    />
-                    All Alumni
-                  </label>
-
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="eventFor"
-                      value="class"
-                      checked={formData.eventFor === "class"}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          eventFor: e.target.value,
-                        })
-                      }
-                    />
-                    Class
-                  </label>
-                </div>
-              </div>
-
-              {/* CONDITIONAL FIELDS */}
-              {formData.eventFor === "class" && (
-                <>
-                  <div>
-                    <label className="text-sm font-medium text-slate-700">
-                      Pass Out Session
-                    </label>
-
-                    <input
-                      type="text"
-                      placeholder="2025"
-                      className="w-full mt-2 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
-                      value={formData.session}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          session: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-slate-700">
-                      Class
-                    </label>
-
-                    <input
-                      type="text"
-                      placeholder="Class 10"
-                      className="w-full mt-2 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
-                      value={formData.className}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          className: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-slate-700">
-                      Section
-                    </label>
-
-                    <input
-                      type="text"
-                      placeholder="A"
-                      className="w-full mt-2 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
-                      value={formData.section}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          section: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </>
-              )}
-
-              {/* TITLE */}
-              <div className="md:col-span-2">
-                <label className="text-sm font-medium text-slate-700">
-                  Event Title
-                </label>
-
-                <input
-                  type="text"
-                  className="w-full mt-2 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      title: e.target.value,
-                    })
-                  }
-                />
-              </div>
-
-              {/* DATES */}
-              <div>
-                <label className="text-sm font-medium text-slate-700">
-                  Event From Date
-                </label>
-
-                <input
-                  type="date"
-                  className="w-full mt-2 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
-                  value={formData.from}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      from: e.target.value,
-                    })
-                  }
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-700">
-                  Event To Date
-                </label>
-
-                <input
-                  type="date"
-                  className="w-full mt-2 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
-                  value={formData.to}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      to: e.target.value,
-                    })
-                  }
-                />
-              </div>
-
-              {/* PHOTO */}
-              <div className="md:col-span-2">
-                <label className="text-sm font-medium text-slate-700">
-                  Photo
-                </label>
-
-                <input
-                  type="file"
-                  className="w-full mt-2 border border-slate-300 rounded-xl px-4 py-3"
-                />
-              </div>
-
-              {/* NOTE */}
-              <div className="md:col-span-2">
-                <label className="text-sm font-medium text-slate-700">
-                  Note
-                </label>
-
-                <textarea
-                  rows="4"
-                  className="w-full mt-2 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
-                  value={formData.note}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      note: e.target.value,
-                    })
-                  }
-                ></textarea>
-              </div>
-
-              {/* NOTIFICATION */}
-              <div className="md:col-span-2">
-                <label className="text-sm font-medium text-slate-700">
-                  Event Notification Message
-                </label>
-
-                <textarea
-                  rows="4"
-                  className="w-full mt-2 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
-                  value={formData.notification}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      notification: e.target.value,
-                    })
-                  }
-                ></textarea>
-              </div>
-
-              {/* FOOTER */}
-              <div className="md:col-span-2 flex justify-end">
-                <button
-                  type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-all"
-                >
-                  Save Event
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ================= VIEW MODAL ================= */}
-      {viewModal && selectedEvent && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden">
-            {/* HEADER */}
-            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-              <h2 className="text-2xl font-bold text-slate-800">
-                Event Description
-              </h2>
 
               <button
-                onClick={() => setViewModal(false)}
-                className="p-2 hover:bg-slate-100 rounded-xl"
+                onClick={handleSave}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded"
               >
-                <X size={20} />
+                Save Event
               </button>
-            </div>
 
-            {/* BODY */}
-            <div className="p-6">
-              <div className="flex items-start gap-5">
-                <img
-                  src={selectedEvent.photo}
-                  alt=""
-                  className="w-28 h-28 rounded-2xl object-cover"
-                />
-
-                <div>
-                  <h3 className="text-2xl font-bold text-slate-800">
-                    {selectedEvent.title}
-                  </h3>
-
-                  <p className="text-slate-500 mt-2">
-                    {selectedEvent.from} - {selectedEvent.to}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <h4 className="font-semibold text-slate-800 mb-2">Note</h4>
-
-                <p className="text-slate-600 leading-relaxed">
-                  {selectedEvent.note}
-                </p>
-              </div>
-
-              <div className="mt-6">
-                <h4 className="font-semibold text-slate-800 mb-2">
-                  Event Notification Message
-                </h4>
-
-                <p className="text-slate-600 leading-relaxed">
-                  {selectedEvent.notification}
-                </p>
-              </div>
             </div>
           </div>
         </div>
       )}
     </div>
   );
-};
-
-export default Events;
+}
