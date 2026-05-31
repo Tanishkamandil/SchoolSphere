@@ -1,28 +1,27 @@
-// src/pages/examination/DesignMarksheet.jsx
+// src/pages/examination/DesignAdmitCard.jsx
 import React, { useState } from "react";
 
-const DesignMarksheet = () => {
+const DesignAdmitCard = () => {
   const [formData, setFormData] = useState({
     template: "",
     heading: "",
     title: "",
     examName: "",
     schoolName: "",
+    examCenter: "",
     footerText: "",
 
-    // fields toggle
     name: false,
     fatherName: false,
     motherName: false,
     dob: false,
-    rollNumber: false,
     admissionNo: false,
+    rollNumber: false,
+    address: false,
+    gender: false,
+    photo: false,
     class: false,
     section: false,
-    subject: false,
-    marks: false,
-    grade: false,
-    percentage: false,
   });
 
   const handleChange = (e) => {
@@ -36,25 +35,27 @@ const DesignMarksheet = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     console.log(formData);
-    alert("Marksheet Design Saved Successfully");
+    alert("Admit Card Saved Successfully");
   };
 
   return (
     <div className="p-4 bg-light min-vh-100">
       <div className="row">
-
-        {/* LEFT SIDE FORM */}
+        {/* LEFT SIDE */}
         <div className="col-md-5">
           <div className="card shadow-sm border-0">
             <div className="card-body">
-              <h3 className="mb-4">Design Marksheet</h3>
+              <h3 className="mb-4">Add Admit Card</h3>
 
               <form onSubmit={handleSubmit}>
-
                 {/* Template */}
                 <div className="mb-3">
-                  <label className="form-label fw-semibold">Template *</label>
+                  <label className="form-label fw-semibold">
+                    Template <span className="text-danger">*</span>
+                  </label>
+
                   <input
                     type="text"
                     className="form-control"
@@ -62,9 +63,10 @@ const DesignMarksheet = () => {
                     value={formData.template}
                     onChange={handleChange}
                   />
+
                   {!formData.template && (
                     <small className="text-danger">
-                      Template is required
+                      The Template field is required.
                     </small>
                   )}
                 </div>
@@ -72,6 +74,7 @@ const DesignMarksheet = () => {
                 {/* Heading */}
                 <div className="mb-3">
                   <label className="form-label fw-semibold">Heading</label>
+
                   <input
                     type="text"
                     className="form-control"
@@ -84,6 +87,7 @@ const DesignMarksheet = () => {
                 {/* Title */}
                 <div className="mb-3">
                   <label className="form-label fw-semibold">Title</label>
+
                   <input
                     type="text"
                     className="form-control"
@@ -96,6 +100,7 @@ const DesignMarksheet = () => {
                 {/* Exam Name */}
                 <div className="mb-3">
                   <label className="form-label fw-semibold">Exam Name</label>
+
                   <input
                     type="text"
                     className="form-control"
@@ -107,7 +112,10 @@ const DesignMarksheet = () => {
 
                 {/* School Name */}
                 <div className="mb-3">
-                  <label className="form-label fw-semibold">School Name</label>
+                  <label className="form-label fw-semibold">
+                    School Name
+                  </label>
+
                   <input
                     type="text"
                     className="form-control"
@@ -117,9 +125,27 @@ const DesignMarksheet = () => {
                   />
                 </div>
 
+                {/* Exam Center */}
+                <div className="mb-3">
+                  <label className="form-label fw-semibold">
+                    Exam Center
+                  </label>
+
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="examCenter"
+                    value={formData.examCenter}
+                    onChange={handleChange}
+                  />
+                </div>
+
                 {/* Footer */}
                 <div className="mb-3">
-                  <label className="form-label fw-semibold">Footer Text</label>
+                  <label className="form-label fw-semibold">
+                    Footer Text
+                  </label>
+
                   <textarea
                     className="form-control"
                     rows="3"
@@ -131,12 +157,20 @@ const DesignMarksheet = () => {
 
                 {/* Uploads */}
                 <div className="mb-3">
-                  <label className="form-label fw-semibold">Logo</label>
+                  <label className="form-label fw-semibold">Left Logo</label>
+
                   <input type="file" className="form-control" />
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label fw-semibold">Signature</label>
+                  <label className="form-label fw-semibold">Right Logo</label>
+
+                  <input type="file" className="form-control" />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label fw-semibold">Sign</label>
+
                   <input type="file" className="form-control" />
                 </div>
 
@@ -144,6 +178,7 @@ const DesignMarksheet = () => {
                   <label className="form-label fw-semibold">
                     Background Image
                   </label>
+
                   <input type="file" className="form-control" />
                 </div>
 
@@ -153,26 +188,25 @@ const DesignMarksheet = () => {
                     ["name", "Name"],
                     ["fatherName", "Father Name"],
                     ["motherName", "Mother Name"],
-                    ["dob", "Date of Birth"],
-                    ["rollNumber", "Roll Number"],
+                    ["dob", "Date Of Birth"],
                     ["admissionNo", "Admission No"],
+                    ["rollNumber", "Roll Number"],
+                    ["address", "Address"],
+                    ["gender", "Gender"],
+                    ["photo", "Photo"],
                     ["class", "Class"],
                     ["section", "Section"],
-                    ["subject", "Subjects"],
-                    ["marks", "Marks"],
-                    ["grade", "Grade"],
-                    ["percentage", "Percentage"],
                   ].map(([key, label]) => (
                     <div
-                      key={key}
                       className="col-md-6 mb-3 d-flex justify-content-between align-items-center"
+                      key={key}
                     >
                       <label className="fw-semibold">{label}</label>
 
                       <div className="form-check form-switch">
                         <input
-                          type="checkbox"
                           className="form-check-input"
+                          type="checkbox"
                           name={key}
                           checked={formData[key]}
                           onChange={handleChange}
@@ -183,20 +217,19 @@ const DesignMarksheet = () => {
                 </div>
 
                 <button className="btn btn-secondary w-100">
-                  Save Marksheet
+                  Save
                 </button>
               </form>
             </div>
           </div>
         </div>
 
-        {/* RIGHT SIDE LIST */}
+        {/* RIGHT SIDE */}
         <div className="col-md-7">
           <div className="card shadow-sm border-0">
             <div className="card-body">
-
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h3>Marksheet List</h3>
+                <h3>Admit Card List</h3>
 
                 <input
                   type="text"
@@ -209,15 +242,15 @@ const DesignMarksheet = () => {
                 <table className="table table-bordered align-middle">
                   <thead className="table-light">
                     <tr>
-                      <th>Marksheet Name</th>
-                      <th>Background</th>
+                      <th>Certificate Name</th>
+                      <th>Background Image</th>
                       <th>Action</th>
                     </tr>
                   </thead>
 
                   <tbody>
                     <tr>
-                      <td>Sample Marksheet</td>
+                      <td>Sample Admit Card</td>
 
                       <td>
                         <img
@@ -230,25 +263,23 @@ const DesignMarksheet = () => {
                         <button className="btn btn-sm btn-primary me-2">
                           Edit
                         </button>
+
                         <button className="btn btn-sm btn-danger">
                           Delete
                         </button>
                       </td>
                     </tr>
                   </tbody>
-
                 </table>
               </div>
 
               <p className="text-muted">Records: 1 to 1 of 1</p>
-
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
 };
 
-export default DesignMarksheet;
+export default DesignAdmitCard;
